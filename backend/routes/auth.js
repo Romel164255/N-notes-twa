@@ -39,10 +39,10 @@ router.get(
       }
 
       // ⚪ Old web fallback
-      return res.redirect("https://n-notes-zeta.vercel.app");
+      return res.redirect("https://n-notes-twa.vercel.app/");
     } catch (err) {
       console.error("❌ Auth redirect error:", err);
-      return res.redirect("https://n-notes-zeta.vercel.app");
+      return res.redirect("https://n-notes-twa.vercel.app/");
     }
   }
 );
