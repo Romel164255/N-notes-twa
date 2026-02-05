@@ -1,7 +1,8 @@
 /* ----------------------------------------------------------
- 🌑 NOTHING THEME STYLING — clean, minimal, red accent
+ 🌑 NOTHING NOTES — CLEAN, READABLE, FIXED
 ------------------------------------------------------------- */
 
+/* Nothing font (ONLY for app title) */
 @font-face {
   font-family: 'Nothing';
   src: url('/fonts/NOTHING.woff2') format('woff2');
@@ -10,21 +11,27 @@
   font-display: swap;
 }
 
+/* ---------------------- VARIABLES ---------------------- */
 :root {
   --nothing-red: #d71921;
   --radius-xl: 22px;
-  --shadow-light: 0 2px 10px rgba(0, 0, 0, 0.08);
-  --shadow-dark: 0 4px 12px rgba(0, 0, 0, 0.25);
+  --shadow-light: 0 2px 10px rgba(0,0,0,0.08);
+  --shadow-dark: 0 4px 12px rgba(0,0,0,0.25);
   --transition-fast: 0.25s ease;
+
+  /* Typography */
+  --font-ui: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-title: Inter, system-ui, sans-serif;
+  --font-content: Inter, system-ui, sans-serif;
+  --font-brand: 'Nothing', sans-serif;
 }
 
-/* ---------------------- BODY ---------------------- */
+/* ---------------------- BASE ---------------------- */
 body {
-  font-family: "Inter", "Nothing", sans-serif;
   margin: 0;
   padding: 0;
+  font-family: var(--font-ui);
   overflow-x: hidden;
-  transition: background 0.4s ease, color 0.4s ease;
 }
 
 .app-container {
@@ -34,186 +41,57 @@ body {
   transition: background 0.4s ease, color 0.4s ease;
 }
 
-/* ---------------------- HEADER ---------------------- */
-.top-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 14px 24px;
-  backdrop-filter: blur(10px);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.Main-head {
-  font-size: 4rem;
-  font-weight: 600;
-  font-family: 'Nothing', sans-serif;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  user-select: none;
-}
-
-.theme-toggle {
-  background: transparent;
-  border: none;
-  font-size: 1.6rem;
-  cursor: pointer;
-  transition: transform var(--transition-fast);
-}
-.theme-toggle:hover {
-  transform: scale(1.25);
-}
-
-/* ---------------------- DARK / LIGHT MODE ---------------------- */
+/* ---------------------- THEMES ---------------------- */
 .app-container.dark {
   background: radial-gradient(circle at top left, #0a0a0a, #1a1a1a 60%);
   color: #eaeaea;
-}
 
-.app-container.dark .top-bar {
-  background: rgba(22, 22, 22, 0.6);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow-dark);
+  --note-0: rgba(215,25,33,0.10);
+  --note-1: rgba(215,25,33,0.18);
+  --note-2: rgba(215,25,33,0.26);
+  --note-3: rgba(215,25,33,0.34);
+  --note-4: rgba(215,25,33,0.42);
 }
 
 .app-container.light {
   background: linear-gradient(to bottom right, #fafafa, #e9e9e9);
   color: #121212;
+
+  --note-0: rgba(215,25,33,0.06);
+  --note-1: rgba(215,25,33,0.12);
+  --note-2: rgba(215,25,33,0.18);
+  --note-3: rgba(215,25,33,0.24);
+  --note-4: rgba(215,25,33,0.30);
+}
+
+/* ---------------------- TOP BAR ---------------------- */
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 14px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  backdrop-filter: blur(10px);
+}
+
+.app-container.dark .top-bar {
+  background: rgba(22,22,22,0.6);
+  box-shadow: var(--shadow-dark);
 }
 
 .app-container.light .top-bar {
-  background: rgba(255, 255, 255, 0.65);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(255,255,255,0.65);
   box-shadow: var(--shadow-light);
 }
 
-/* ---------------------- PROFILE ---------------------- */
-.profile-container {
-  position: relative;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-}
-
-.profile-pic {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--nothing-red);
-  background: #121212;
-  cursor: pointer;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast), border-color 0.2s;
-  box-shadow: 0 2px 24px 1.5px rgba(215, 25, 33, 0.12);
-}
-.profile-pic:hover, .profile-pic:focus-visible {
-  transform: scale(1.07);
-  border-color: #ee262b;
-  box-shadow: 0 2px 32px 3px rgba(215, 25, 33, 0.28);
-}
-
-.profile-menu {
-  position: absolute;
-  right: 0;
-  top: 52px;
-  min-width: 190px;
-  background: rgba(16, 16, 16, 0.90);
-  color: #FAFAFA;
-  border-radius: 18px;
-  padding: 18px 14px 12px 14px;
-  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.32), 0 1.5px 0px 0px #242428 inset;
-  backdrop-filter: blur(10px) saturate(120%);
-  border: 1.5px solid rgba(255,255,255,0.07);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  z-index: 101;
-  letter-spacing: 0.04em;
-  font-family: 'Inter', 'Roboto', Arial, sans-serif;
-}
-.app-container.light .profile-menu {
-  background: rgba(250, 250, 250, 0.88);
-  color: #181A1B;
-  box-shadow: 0 4px 32px 0 rgba(0,0,0,0.08);
-  border: 1.5px solid rgba(0,0,0,0.08);
-}
-
-.profile-menu button {
-  background: none;
-  border: none;
-  color: inherit;
-  padding: 8px 6px 8px 2px;
-  font-size: 1rem;
-  text-align: left;
-  cursor: pointer;
-  border-radius: 9px;
-  font-family: inherit;
-  letter-spacing: .01em;
-  transition: color 0.19s, background 0.17s, padding-left 0.14s;
-}
-.profile-menu button:hover, .profile-menu button:focus-visible {
-  color: var(--nothing-red);
-  background: rgba(215,25,33,0.09);
-  padding-left: 12px;
-}
-
-.profile-menu .divider {
-  height: 1px;
-  margin: 6px 0;
-  background: linear-gradient(90deg, rgba(255,255,255,0.12) 0%, rgba(215,25,33,0.22) 60%, rgba(255,255,255,0.12) 100%);
-  border: none;
-  opacity: 0.92;
-}
-.app-container.light .profile-menu .divider {
-  background: linear-gradient(90deg, rgba(0,0,0,0.16) 0%, rgba(215,25,33,0.13) 60%, rgba(0,0,0,0.13) 100%);
-}
-
-.profile-menu .note {
-  color: #bbbbbb;
-  font-size: 1rem;
-  padding-top: 7px;
-  opacity: 0.82;
-  font-weight: 400;
-}
-
-/* ---------------------- LOGIN BUTTON ---------------------- */
-.menu-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: transparent;
-  border: 2px solid var(--nothing-red);
-  color: var(--nothing-red);
-  border-radius: 14px;
-  padding: 10px 20px;
-  font-weight: 600;
-  font-size: 1rem;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  cursor: pointer;
-  transition: background-color 0.24s ease, color 0.24s ease, box-shadow 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 0 20px rgba(215, 25, 33, 0.2);
+/* ONLY place where Nothing font is used */
+.Main-head {
+  font-family: var(--font-brand);
+  font-size: 4rem;
+  letter-spacing: 2px;
   user-select: none;
-  text-transform: none;
-}
-.menu-btn .google-icon {
-  width: 50px;
-  height: 50px;
-  filter: drop-shadow(0 0 0.5px rgba(215, 25, 33, 0.6));
-}
-.menu-btn:hover,
-.menu-btn:focus-visible {
-  background: var(--nothing-red);
-  color: #fff;
-  box-shadow: 0 0 28px rgba(255, 69, 74, 0.9);
-  transform: scale(1.05);
-}
-.menu-btn:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 14px rgba(255, 0, 8, 0.8);
 }
 
 /* ---------------------- NOTES GRID ---------------------- */
@@ -223,142 +101,308 @@ body {
   padding: 20px;
 }
 
+/* ---------------------- NOTE CARD ---------------------- */
 .note-card {
   break-inside: avoid;
-  margin-bottom: 20px;
   position: relative;
-  border-radius: var(--radius-xl);
+  margin-bottom: 20px;
   padding: 18px;
-  color: inherit;
-  box-shadow: var(--shadow-dark);
-  overflow-wrap: break-word;
-  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  border-radius: var(--radius-xl);
   cursor: pointer;
-  height: auto;
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(6px);
-  display: flex;
-  flex-direction: column;
+  background: transparent;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-dark);
 }
+
 .app-container.light .note-card {
-  background: rgba(255, 255, 255, 0.8);
   box-shadow: var(--shadow-light);
 }
+
 .note-card:hover {
   transform: scale(1.03);
-  box-shadow: 0 6px 15px rgb(255, 0, 0);
 }
 
+/* ---------------------- NOTE COLOR VARIANTS ---------------------- */
+.note-card.variant-0 { background: var(--note-0); }
+.note-card.variant-1 { background: var(--note-1); }
+.note-card.variant-2 { background: var(--note-2); }
+.note-card.variant-3 { background: var(--note-3); }
+.note-card.variant-4 { background: var(--note-4); }
+
+/* ---------------------- NOTE TEXT ---------------------- */
 .note-title {
   margin: 0 0 8px;
-  font-size: 2rem;
-  font-family: 'Poppins', sans-serif;
+  font-family: var(--font-title);
+  font-size: 1.25rem;
   font-weight: 600;
-  letter-spacing: 0.5px;
 }
+
 .note-body {
   margin: 0;
+  font-family: var(--font-content);
+  white-space: pre-wrap;
   font-size: 0.95rem;
-  font-family: 'Inter', sans-serif;
-  font-weight: 400;
   line-height: 1.6;
+  opacity: 0.95;
 }
 
-.delete-btn {
+/* ---------------------- PIN ---------------------- */
+.pin-indicator {
   position: absolute;
-  top: 8px;
-  right: 10px;
-  background: transparent;
-  border: none;
-  color: var(--nothing-red);
-  font-size: 1rem;
-  cursor: pointer;
-  transition: transform var(--transition-fast);
-}
-.delete-btn:hover {
-  transform: scale(1.25);
+  top: 12px;
+  left: 12px;
+  font-size: 16px;
+  opacity: 0.85;
+  pointer-events: none;
 }
 
-/* ---------------------- ADD NOTE BUTTON ---------------------- */
+/* ---------------------- 3 DOT MENU ---------------------- */
+.note-menu {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.note-menu .dots {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  padding: 6px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.menu-popup {
+  position: absolute;
+  bottom: 36px;
+  right: 0;
+  min-width: 140px;
+  padding: 6px;
+  border-radius: 12px;
+  z-index: 20;
+  background: rgba(20,20,20,0.95);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+}
+
+.app-container.light .menu-popup {
+  background: white;
+}
+
+.menu-popup button {
+  width: 100%;
+  padding: 10px 12px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  color: var(--nothing-red);
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.menu-popup button:hover {
+  background: rgba(215,25,33,0.12);
+}
+
+/* ---------------------- FLOATING ADD BUTTON ---------------------- */
 .add-btn {
   position: fixed;
   bottom: 26px;
   right: 26px;
-  width: 60px;
-  height: 60px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   background: var(--nothing-red);
-  color: white;
   border: none;
   cursor: pointer;
-  font-size: 1.8rem;
-  box-shadow: 0 5px 20px rgba(215, 25, 33, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform var(--transition-fast);
-}
-.add-btn:hover {
-  transform: scale(1.15);
+  box-shadow: 0 8px 26px rgba(215,25,33,0.55);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  z-index: 150;
+  overflow: hidden; /* 🔑 keeps quill inside */
 }
 
-/* ---------------------- NOTE EDITOR ---------------------- */
+.add-btn:hover {
+  transform: scale(1.12);
+  box-shadow: 0 12px 36px rgba(215,25,33,0.75);
+}
+
+/* Perfectly centered quill */
+.add-icon {
+  width: 28px;
+  height: 28px;
+  background: #fff;
+  mask: url("/assets/QuillLogoBlackBg.png") no-repeat center / contain;
+  -webkit-mask: url("/assets/QuillLogoBlackBg.png") no-repeat center / contain;
+}
+
+/* ---------------------- EDITOR ---------------------- */
 .editor-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(15, 15, 15, 0.7);
+  inset: 0;
+  z-index: 200;
+  background: rgba(15,15,15,0.7);
   backdrop-filter: blur(10px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 200;
 }
+
 .editor-popup {
-  background: rgba(28, 28, 28, 0.95);
-  border-radius: var(--radius-xl);
-  padding: 24px;
   width: 400px;
+  padding: 24px;
+  border-radius: var(--radius-xl);
+  background: rgba(28,28,28,0.95);
   box-shadow: var(--shadow-dark);
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
 }
+
 .app-container.light .editor-popup {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255,255,255,0.95);
   box-shadow: var(--shadow-light);
 }
-.headline-input, .content-input {
-  padding: 8px;
+
+.headline-input,
+.content-input {
+  width: 100%;
+  padding: 10px;
   border-radius: 10px;
   border: none;
-  outline: none;
-  font-size: 1.1rem;
-  color: inherit;
-  background: rgba(255, 255, 255, 0.1);
-}
-.content-input {
-  resize: none;
-  line-height: 1.5;
-}
-.app-container.light .headline-input,
-.app-container.light .content-input {
-  background: rgba(240, 240, 240, 0.9);
-  color: #111;
+  font-family: var(--font-ui);
+  font-size: 1rem;
 }
 
 /* ---------------------- RESPONSIVE ---------------------- */
 @media (max-width: 1024px) {
-  .notes-grid { column-count: 2; padding: 16px; }
-  .note-title { font-size: 1.8rem; }
-  .note-body { font-size: 0.9rem; }
+  .notes-grid { column-count: 2; }
 }
+
 @media (max-width: 480px) {
-  .notes-grid { column-count: 1; padding: 12px; }
-  .note-card { padding: 14px; }
-  .note-title { font-size: 1.6rem; }
-  .note-body { font-size: 0.85rem; }
-  .add-btn { width: 50px; height: 50px; font-size: 1.5rem; }
+  .notes-grid { column-count: 1; }
 }
+
+
+/* ===============================
+   PREMIUM DELETE + GRAVITY
+   =============================== */
+
+.note-card.deleting {
+  background: hsl(22, 100%, 50%) !important;
+  animation:
+    delete-color 240ms ease-out forwards,
+    delete-gravity 180ms cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    delete-collapse 420ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay:
+    0ms,
+    240ms,
+    420ms; /* color → gravity → collapse */
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Phase 2: Gravity dip */
+@keyframes delete-gravity {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(8px); /* 👈 gravity pull */
+    opacity: 0.96;
+  }
+}
+
+@keyframes delete-collapse {
+  from {
+    max-height: 600px;
+    opacity: 0.96;
+    margin-bottom: 20px;
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    max-height: 0;
+    opacity: 0;
+    margin-bottom: 0;
+    clip-path: inset(0 100% 0 0);
+  }
+}
+
+.editor-image-preview {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-top: 12px;
+  display: block;
+}
+.note-image {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 14px;
+  margin-top: 10px;
+}
+
+.editor-image-preview {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: 14px;
+  margin-top: 12px;
+}
+/* ===============================
+   IMAGE FULLSCREEN VIEW
+   =============================== */
+
+.image-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(12px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.image-fullscreen img {
+  max-width: 92vw;
+  max-height: 92vh;
+  object-fit: contain;
+
+  border-radius: 14px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+/* Close button */
+.image-fullscreen .close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+
+  border: none;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  font-size: 22px;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.image-fullscreen .close-btn:hover {
+  background: rgba(255,255,255,0.22);
+  transform: scale(1.1);
+}
+

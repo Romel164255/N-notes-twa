@@ -1,0 +1,51 @@
+import { openDB } from "idb";
+
+const dbPromise = openDB("n-notes-db", 2, {
+  upgrade(db) {
+    /* NOTES */
+    if (!db.objectStoreNames.contains("notes")) {
+      const store = db.createObjectStore("notes", { keyPath: "id" });
+      store.createIndex("updatedAt", "updatedAt");
+      store.createIndex("deleted", "deleted");
+    }
+
+    /* 🆕 IMAGES */
+    if (!db.objectStoreNames.contains("images")) {
+      db.createObjectStore("images", { keyPath: "id" });
+    }
+  },
+});
+
+/* NOTES (unchanged) */
+export async function getAllNotes() {
+  const db = await dbPromise;
+  return (await db.getAll("notes"))
+    .filter(n => !n.deleted)
+    .sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+export async function saveNote(note) {
+  const db = await dbPromise;
+  await db.put("notes", note);
+}
+
+export async function getNote(id) {
+  const db = await dbPromise;
+  return db.get("notes", id);
+}
+
+/* 🆕 IMAGES */
+export async function saveImage(image) {
+  const db = await dbPromise;
+  await db.put("images", image);
+}
+
+export async function getImage(id) {
+  const db = await dbPromise;
+  return db.get("images", id);
+}
+
+export async function deleteImage(id) {
+  const db = await dbPromise;
+  await db.delete("images", id);
+}

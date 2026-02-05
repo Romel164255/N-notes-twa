@@ -12,6 +12,7 @@ import "./config/passport.js";
 
 import authRoutes from "./routes/auth.js";
 import notesRoutes from "./routes/notes.js";
+import deviceRoutes from "./routes/device.js";
 
 const app = express();
 app.set("trust proxy", 1); // Required for secure cookies on Render
@@ -59,6 +60,7 @@ app.use(passport.session());
 
 app.use("/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
+app.use("/api/device", deviceRoutes);
 
 app.get("/", (req, res) => res.send("✅ Backend running fine for mobile app!"));
 

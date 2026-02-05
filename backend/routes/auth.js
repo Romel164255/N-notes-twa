@@ -12,12 +12,12 @@ router.get(
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
     try {
-      // ✅ Read allowed frontend URLs from env variable
+      //  Read allowed frontend URLs from env variable
       const allowedUrls = process.env.CLIENT_URLS
         ? process.env.CLIENT_URLS.split(",").map(url => url.trim())
         : [];
 
-      // ✅ Detect which domain initiated login
+      //  Detect which domain initiated login
       const origin = req.get("origin") || req.get("referer");
       let redirectTo = allowedUrls[0]; // fallback to first
 

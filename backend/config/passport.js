@@ -1,89 +1,82 @@
 import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import crypto from "crypto";
-import dotenv from "dotenv";
 import { pool } from "../db.js";
 
-dotenv.config();
+const CLIENT_IDS = [
+  process.env.GOOGLE_CLIENT_ID_WEB,
+  process.env.GOOGLE_CLIENT_ID_ANDROID,
+].filter(Boolean);
 
-// ✅ Determine which callback URL to use
-const callbackURL =
-  process.env.GOOGLE_CALLBACK_URL_FIXED?.trim() ||
-  process.env.GOOGLE_CALLBACK_URL?.trim();
-
-if (!callbackURL) {
-  console.error("❌ No valid Google callback URL found in environment variables!");
-} else {
-  console.log("✅ Using Google Callback URL:", callbackURL);
-}
-
-// ✅ Initialize Google OAuth strategy
 passport.use(
   new GoogleStrategy(
     {
-      clientID: process.env.GOOGLE_CLIENT_ID?.trim(),
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET?.trim(),
-      callbackURL,
+      clientID: process.env.GOOGLE_CLIENT_ID_WEB, // required but overridden below
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackURL: process.env.GOOGLE_CALLBACK_URL,
+      passReqToCallback: true,
     },
-    async (accessToken, refreshToken, profile, done) => {
+    async (req, accessToken, refreshToken, profile, done) => {
       try {
+        // ✅ Verify client ID manually
+        const aud = profile._json.aud;
+        if (!CLIENT_IDS.includes(aud)) {
+          return done(new Error("Invalid OAuth client"));
+        }
+
         const googleSub = profile.id;
         const email = profile.emails?.[0]?.value || null;
         const name = profile.displayName || null;
         const picture = profile.photos?.[0]?.value || null;
 
-        // Hash Google 'sub' ID for additional security
-        const hash = crypto.createHash("sha256").update(googleSub).digest("hex");
+        const subHash = crypto
+          .createHash("sha256")
+          .update(googleSub)
+          .digest("hex");
 
-        // 🔍 Check if user exists
-        const result = await pool.query(
+        let result = await pool.query(
           "SELECT * FROM users WHERE google_sub_hash = $1",
-          [hash]
+          [subHash]
         );
 
         let user;
 
         if (result.rows.length === 0) {
-          // 🆕 Insert new user
           const insert = await pool.query(
-            `INSERT INTO users (google_sub_hash, email, name, google_id, picture, last_seen)
+            `INSERT INTO users
+             (google_sub_hash, google_sub, email, name, picture, last_login)
              VALUES ($1, $2, $3, $4, $5, NOW())
              RETURNING *`,
-            [hash, email, name, googleSub, picture]
+            [subHash, googleSub, email, name, picture]
           );
           user = insert.rows[0];
-          console.log("✅ New user created:", email || name);
         } else {
           user = result.rows[0];
-          // 🕓 Update last_seen + picture
           await pool.query(
-            "UPDATE users SET last_seen = NOW(), picture = $1 WHERE id = $2",
+            `UPDATE users
+             SET last_login = NOW(), picture = $1
+             WHERE id = $2`,
             [picture, user.id]
           );
-          console.log("✅ Existing user logged in:", email || name);
         }
 
         return done(null, user);
       } catch (err) {
-        console.error("❌ GoogleStrategy Error:", err.message);
         return done(err, null);
       }
     }
   )
 );
 
-// ✅ Serialize user ID into the session
 passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-// ✅ Deserialize user from the session
 passport.deserializeUser(async (id, done) => {
   try {
     const res = await pool.query("SELECT * FROM users WHERE id = $1", [id]);
     done(null, res.rows[0]);
   } catch (err) {
-    console.error("❌ Deserialize Error:", err.message);
     done(err, null);
   }
 });
