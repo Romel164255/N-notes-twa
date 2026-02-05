@@ -115,3 +115,19 @@ export async function deleteImage(id) {
     [id]
   );
 }
+
+export async function getDirtyNotes() {
+  const conn = await open();
+  const res = await conn.query(
+    "SELECT * FROM notes WHERE dirty = 1 AND deleted = 0"
+  );
+  return res.values || [];
+}
+
+export async function markClean(id) {
+  const conn = await open();
+  await conn.run(
+    "UPDATE notes SET dirty = 0 WHERE id = ?",
+    [id]
+  );
+}

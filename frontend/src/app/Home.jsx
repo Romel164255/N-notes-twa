@@ -10,6 +10,7 @@ import NotesList from "./NotesList";
 import EditorModal from "./EditorModal";
 import FloatingAdd from "./FloatingAdd";
 import ThemeToggle from "../ui/ThemeToggle";
+import { login } from "../auth/auth";
 
 export default function Home({
   user,
@@ -24,9 +25,8 @@ export default function Home({
   const API = import.meta.env.VITE_API_URL;
 
   /* ---------------- LOGIN ---------------- */
-  function login() {
-    window.location.href = `${API}/auth/google`;
-  }
+  
+  
 
   /* ---------------- LOAD NOTES ---------------- */
   useEffect(() => {

@@ -1,12 +1,8 @@
-import { Browser } from '@capacitor/browser';
-import { Token } from './token';
+import { Browser } from "@capacitor/browser";
 
 export async function login() {
   await Browser.open({
-    url: 'https://api.yourdomain.com/auth/google'
+    // 👇 VERY IMPORTANT
+    url: "https://n-notes.onrender.com/auth/google?client=apk",
   });
 }
-
-window.handleAuthCallback = async (token) => {
-  await Token.set(token);
-};

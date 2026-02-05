@@ -1,6 +1,6 @@
 {
   "appId": "com.romel.nnotes",
-  "appName": "N Notes",
+  "appName": "NNotes",
   "webDir": "dist",
   "bundledWebRuntime": false,
   "server": {

@@ -1,15 +1,15 @@
-import { Storage } from "./storage";
+import { storage } from "./storage";
 
 export const Token = {
   async get() {
-    return await Storage.get("token");
+    return await storage.get("token");
   },
 
   async set(token) {
-    await Storage.set("token", token);
+    await storage.set("token", token);
   },
 
   async clear() {
-    await Storage.remove("token");
+    await storage.remove("token");
   },
 };

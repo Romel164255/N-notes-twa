@@ -3,46 +3,64 @@ import passport from "passport";
 
 const router = express.Router();
 
-// 🧠 Start Google login
-router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+/**
+ * START GOOGLE LOGIN
+ * - Stores who started login (apk / web_new / web_old)
+ */
+router.get(
+  "/google",
+  (req, res, next) => {
+    // client can be: apk | web_new | web_old
+    req.session.client = req.query.client || "web_old";
+    next();
+  },
+  passport.authenticate("google", { scope: ["profile", "email"] })
+);
 
-// 🧠 Handle Google callback
+/**
+ * GOOGLE CALLBACK
+ * - Redirects based on stored client
+ */
 router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
     try {
-      //  Read allowed frontend URLs from env variable
-      const allowedUrls = process.env.CLIENT_URLS
-        ? process.env.CLIENT_URLS.split(",").map(url => url.trim())
-        : [];
+      const client = req.session.client;
 
-      //  Detect which domain initiated login
-      const origin = req.get("origin") || req.get("referer");
-      let redirectTo = allowedUrls[0]; // fallback to first
-
-      if (origin) {
-        const match = allowedUrls.find(url => origin.startsWith(url));
-        if (match) redirectTo = match;
+      // 🔥 APK → return INTO app
+      if (client === "apk") {
+        return res.redirect("capacitor://localhost");
       }
 
-      console.log(`🔁 Redirecting user to: ${redirectTo}`);
-      res.redirect(redirectTo);
-    } catch (error) {
-      console.error("❌ Redirect error:", error.message);
-      res.redirect(allowedUrls[0] || "/");
+      // 🟢 New web UI
+      if (client === "web_new") {
+        return res.redirect("https://n-notes-twa.vercel.app");
+      }
+
+      // ⚪ Old web fallback
+      return res.redirect("https://n-notes-zeta.vercel.app");
+    } catch (err) {
+      console.error("❌ Auth redirect error:", err);
+      return res.redirect("https://n-notes-zeta.vercel.app");
     }
   }
 );
 
-// 🧠 Return current authenticated user
+/**
+ * CURRENT USER
+ */
 router.get("/me", (req, res) => {
-  res.json(req.isAuthenticated()
-    ? { loggedIn: true, user: req.user }
-    : { loggedIn: false });
+  res.json(
+    req.isAuthenticated()
+      ? { loggedIn: true, user: req.user }
+      : { loggedIn: false }
+  );
 });
 
-// 🧠 Logout
+/**
+ * LOGOUT
+ */
 router.get("/logout", (req, res, next) => {
   req.logout(err => {
     if (err) return next(err);

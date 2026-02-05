@@ -1,9 +1,8 @@
-import { dbPromise } from "../db/indexedDb";
+import { db } from "../db/adapter";
 import { Token } from "../auth/token";
-import { saveConflict } from "./conflict";
+import { saveConflict } from "./conflicts";
 
 export async function pullNotes() {
-  const db = await dbPromise;
   const token = await Token.get();
 
   const res = await fetch(
@@ -20,10 +19,10 @@ export async function pullNotes() {
   const remoteNotes = await res.json();
 
   for (const remote of remoteNotes) {
-    const local = await db.get("notes", remote.id);
+    const local = await db.getNote(remote.id);
 
     if (!local) {
-      await db.put("notes", { ...remote, dirty: false });
+      await db.saveNote({ ...remote, dirty: false });
       continue;
     }
 
@@ -38,6 +37,6 @@ export async function pullNotes() {
       continue;
     }
 
-    await db.put("notes", { ...remote, dirty: false });
+    await db.saveNote({ ...remote, dirty: false });
   }
 }

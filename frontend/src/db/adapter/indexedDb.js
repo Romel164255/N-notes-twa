@@ -49,3 +49,19 @@ export async function deleteImage(id) {
   const db = await dbPromise;
   await db.delete("images", id);
 }
+
+export async function getDirtyNotes() {
+  const db = await dbPromise;
+  const all = await db.getAll("notes");
+  return all.filter(n => n.dirty && !n.deleted);
+}
+
+export async function markClean(id) {
+  const db = await dbPromise;
+  const note = await db.get("notes", id);
+  if (!note) return;
+
+  note.dirty = false;
+  await db.put("notes", note);
+}
+

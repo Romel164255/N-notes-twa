@@ -1,10 +1,9 @@
-import { dbPromise } from "../db/indexedDb";
+import { db } from "../db/adapter";
 import { Token } from "../auth/token";
-// import { uploadImage } from "./drive"; // enabled later
 
 export async function pushNotes() {
-  const db = await dbPromise;
-  const dirtyNotes = await db.getAllFromIndex("notes", "dirty", true);
+  // Adapter method — YOU must expose this in indexedDb + sqlite
+  const dirtyNotes = await db.getDirtyNotes();
   if (!dirtyNotes.length) return;
 
   const token = await Token.get();
@@ -24,13 +23,11 @@ export async function pushNotes() {
         }),
       });
 
-      note.dirty = false;
-      await db.put("notes", note);
+      await db.markClean(note.id);
     } catch (err) {
-  const msg =
-    err instanceof Error ? err.message : String(err);
-  console.warn("Push failed:", msg);
-}
-
+      const msg =
+        err instanceof Error ? err.message : String(err);
+      console.warn("Push failed:", note.id, msg);
+    }
   }
 }

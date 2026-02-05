@@ -11,7 +11,7 @@ async function getPreferences() {
   return Preferences;
 }
 
-export const Storage = {
+export const storage = {
   async get(key) {
     if (Capacitor.isNativePlatform()) {
       const prefs = await getPreferences();
