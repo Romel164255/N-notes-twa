@@ -5,40 +5,35 @@ import "./index.css";
 import "./App.css";
 
 import App from "./app/App";
+import { Token } from "./auth/token";
 
-// 👇 Capacitor-only logic (safe for Vercel + APK)
+/**
+ * 🔐 Native-only deep link handling
+ * No Capacitor imports — uses injected global
+ */
 if (typeof window !== "undefined") {
-  const isCapacitor = window.Capacitor?.isNativePlatform?.();
+  const cap = window.Capacitor;
 
-  if (isCapacitor) {
-    (async () => {
-      const { App: CapApp } = await import(
-        /* @vite-ignore */ "@capacitor/app"
-      );
-      const { Browser } = await import(
-        /* @vite-ignore */ "@capacitor/browser"
-      );
-      const { Token } = await import("./auth/token");
+  if (cap?.isNativePlatform?.()) {
+    cap.Plugins?.App?.addListener?.("appUrlOpen", async ({ url }) => {
+      if (!url) return;
 
-      CapApp.addListener("appUrlOpen", async ({ url }) => {
-        if (!url) return;
+      try {
+        const parsed = new URL(url);
+        const token = parsed.searchParams.get("token");
 
-        try {
-          const parsed = new URL(url);
-          const token = parsed.searchParams.get("token");
+        if (token) {
+          await Token.set(token);
 
-          if (token) {
-            await Token.set(token);
-            await Browser.close(); // 🔥 closes Chrome
-          }
-        } catch (err) {
-          console.error("Invalid deep link URL", err);
+          // Close Chrome Custom Tab if available
+          cap.Plugins?.Browser?.close?.();
         }
-      });
-    })();
+      } catch (err) {
+        console.error("Invalid deep link URL", err);
+      }
+    });
   }
 }
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
