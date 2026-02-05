@@ -1,13 +1,15 @@
-import { Preferences } from '@capacitor/preferences';
+import { Storage } from "./storage";
 
 export const Token = {
-  async set(token) {
-    await Preferences.set({ key: 'jwt', value: token });
-  },
   async get() {
-    return (await Preferences.get({ key: 'jwt' })).value;
+    return await Storage.get("token");
   },
+
+  async set(token) {
+    await Storage.set("token", token);
+  },
+
   async clear() {
-    await Preferences.remove({ key: 'jwt' });
-  }
+    await Storage.remove("token");
+  },
 };
