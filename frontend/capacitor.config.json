@@ -1,5 +1,10 @@
 {
-  "appId": "comm.rome.nnotes",
-  "appName": "N NOtes",
-  "webDir": "dist"
+  "appId": "com.romel.nnotes",
+  "appName": "N Notes",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "server": {
+    "url": "https://n-notes-twa.vercel.app",
+    "cleartext": false
+  }
 }

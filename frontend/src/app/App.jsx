@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Home from "./Home.jsx";
-import { startBackgroundSync } from "./sync";
+import { startBackgroundSync } from "../sync";
 
 export default function App() {
   const [isDark, setIsDark] = useState(
