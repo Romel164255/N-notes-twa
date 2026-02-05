@@ -1,28 +1,27 @@
 import express from "express";
-import auth from "../middleware/authSession.js";
 import { pool } from "../db.js";
 
 const router = express.Router();
 
-router.post("/", auth, async (req, res) => {
+router.post("/", async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Not authenticated" });
+  }
+
   const { platform, model, os, appVersion } = req.body;
 
   await pool.query(
     `
-    UPDATE users
-    SET device_info = $1
-    WHERE id = $2
+    INSERT INTO device_info (user_id, platform, model, os, app_version, last_seen)
+    VALUES ($1, $2, $3, $4, $5, NOW())
+    ON CONFLICT (user_id, platform)
+    DO UPDATE SET
+      model = $3,
+      os = $4,
+      app_version = $5,
+      last_seen = NOW()
     `,
-    [
-      {
-        platform,
-        model,
-        os,
-        appVersion,
-        lastSeen: Date.now(),
-      },
-      req.user.id,
-    ]
+    [req.user.id, platform, model, os, appVersion]
   );
 
   res.json({ ok: true });

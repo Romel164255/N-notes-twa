@@ -62,6 +62,8 @@ app.use("/auth", authRoutes);
 app.use("/api/notes", notesRoutes);
 app.use("/api/device", deviceRoutes);
 
+
+
 app.get("/", (req, res) => res.send("✅ Backend running fine for mobile app!"));
 
 const PORT = process.env.PORT || 5000;
