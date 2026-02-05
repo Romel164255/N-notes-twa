@@ -6,14 +6,18 @@ import "./App.css";
 
 import App from "./app/App";
 
-// 👇 Capacitor-only logic (safe for web builds)
+// 👇 Capacitor-only logic (safe for Vercel + APK)
 if (typeof window !== "undefined") {
   const isCapacitor = window.Capacitor?.isNativePlatform?.();
 
   if (isCapacitor) {
     (async () => {
-      const { App: CapApp } = await import("@capacitor/app");
-      const { Browser } = await import("@capacitor/browser");
+      const { App: CapApp } = await import(
+        /* @vite-ignore */ "@capacitor/app"
+      );
+      const { Browser } = await import(
+        /* @vite-ignore */ "@capacitor/browser"
+      );
       const { Token } = await import("./auth/token");
 
       CapApp.addListener("appUrlOpen", async ({ url }) => {
@@ -34,6 +38,7 @@ if (typeof window !== "undefined") {
     })();
   }
 }
+
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
