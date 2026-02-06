@@ -2,9 +2,5 @@
   "appId": "com.romel.nnotes",
   "appName": "NNotes",
   "webDir": "dist",
-  "bundledWebRuntime": false,
-  "server": {
-    "url": "https://n-notes-twa.vercel.app",
-    "cleartext": false
-  }
+  "bundledWebRuntime": false
 }
