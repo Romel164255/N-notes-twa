@@ -5,33 +5,32 @@ const router = express.Router();
 
 /**
  * START GOOGLE LOGIN
- * Use OAuth state to remember client
+ * We pass `client` via OAuth state (survives Google redirects)
  */
 router.get("/google", (req, res, next) => {
   const client = req.query.client || "web";
 
   passport.authenticate("google", {
     scope: ["profile", "email"],
-    state: client, // 🔑 survives OAuth round-trip
+    state: client, // 🔑 survives redirect
   })(req, res, next);
 });
 
 /**
  * GOOGLE CALLBACK
- * Redirect explicitly — no env fallbacks
  */
 router.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/" }),
   (req, res) => {
-    const client = req.query.state;
+    const client = req.query.state; // 🔑 returned by Google
 
-    // 📱 Android app
+    // 📱 APK → return control to Capacitor WebView
     if (client === "apk") {
       return res.redirect("capacitor://localhost");
     }
 
-    // 🌐 Web (ONLY ONE)
+    // 🌐 Web users
     return res.redirect("https://n-notes-twa.vercel.app");
   }
 );
@@ -54,7 +53,7 @@ router.get("/logout", (req, res, next) => {
   req.logout(err => {
     if (err) return next(err);
     res.clearCookie("connect.sid");
-    res.json({ ok: true });
+    res.status(200).json({ ok: true });
   });
 });
 
