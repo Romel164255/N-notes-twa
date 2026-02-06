@@ -25,9 +25,10 @@ router.get(
   (req, res) => {
     const client = req.query.state; // 🔑 returned by Google
 
-    // 📱 APK → return control to Capacitor WebView
+    // 📱 APK → return control to Capacitor WebView with deep link
     if (client === "apk") {
-      return res.redirect("capacitor://localhost");
+      // This should trigger the appUrlOpen listener in your app
+      return res.redirect("com.romel.nnotes://oauth-callback");
     }
 
     // 🌐 Web users
