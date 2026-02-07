@@ -1,5 +1,4 @@
-console.log("🔥 BOOT SIGNATURE: server.js 2026-02-07 A");
-
+console.log("🔥 BOOT SIGNATURE: server.js 2026-02-07 FINAL");
 
 import express from "express";
 import session from "express-session";
@@ -25,7 +24,7 @@ import deviceRoutes from "./routes/device.js";
 const app = express();
 app.set("trust proxy", 1);
 
-/* ---------------- CORS (MUST BE FIRST) ---------------- */
+/* ---------------- CORS (ABSOLUTELY FIRST) ---------------- */
 
 const allowedOrigins = process.env.CLIENT_URLS
   ? process.env.CLIENT_URLS.split(",").map(o => o.trim())
@@ -33,7 +32,7 @@ const allowedOrigins = process.env.CLIENT_URLS
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // Allow same-origin, mobile apps, curl
+    // allow same-origin, curl, mobile apps
     if (!origin) return callback(null, true);
 
     const isAllowed =
@@ -45,17 +44,15 @@ const corsOptions = {
     }
 
     console.log("❌ CORS blocked origin:", origin);
-    return callback(new Error("Not allowed by CORS"));
+    return callback(null, false); // ✅ NEVER throw here
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
-
 
 /* ---------------- BASIC MIDDLEWARE ---------------- */
 
@@ -78,8 +75,8 @@ app.use(
     proxy: true,
     cookie: {
       httpOnly: true,
-      secure: true,
-      sameSite: "none",
+      secure: true,        // required for Render + HTTPS
+      sameSite: "none",    // required for cross-site cookies
       maxAge: 1000 * 60 * 60 * 24 * 30,
     },
   })
@@ -96,14 +93,18 @@ app.use("/auth", authRoutes);
 app.use("/api/device", deviceRoutes);
 app.use("/api/sync", syncRoutes);
 
+/* ---------------- HEALTH ---------------- */
+
 app.get("/", (req, res) => {
-res.send("✅ Backend running fine — BOOT A");
+  res.send("✅ Backend running fine — FINAL");
 });
 
 app.get("/v", (req, res) => {
-   console.log("🔥 __version route HIT");
-  res.json({ version: "cors-clean-2026-02-07" });
+  console.log("🔥 __version route HIT");
+  res.json({ version: "cors-fixed-final" });
 });
+
+/* ---------------- ERROR HANDLER ---------------- */
 
 app.use((err, req, res, next) => {
   console.error("🔥 Unhandled error:", err);
