@@ -8,37 +8,30 @@ import connectPgSimple from "connect-pg-simple";
 
 dotenv.config();
 
+/* ---------------- INTERNAL IMPORTS ---------------- */
+
 import { pool } from "./db.js";
 import "./config/passport.js";
 
 import authRoutes from "./routes/auth.js";
-import notesRoutes from "./routes/notes.js";
+import syncRoutes from "./routes/sync.js";
 import deviceRoutes from "./routes/device.js";
+
+/* ---------------- APP INIT ---------------- */
 
 const app = express();
 app.set("trust proxy", 1);
 
-/* ---------------- BASIC MIDDLEWARE ---------------- */
-
-app.use(cookieParser());
-app.use(express.json());
-
-/* ---------------- CORS (FINAL + CORRECT) ---------------- */
+/* ---------------- CORS (MUST BE FIRST) ---------------- */
 
 const allowedOrigins = process.env.CLIENT_URLS
   ? process.env.CLIENT_URLS.split(",").map(o => o.trim())
   : [];
 
-/**
- * Allow:
- * - Explicit CLIENT_URLS
- * - Any *.vercel.app (preview + prod)
- * - No-origin requests (mobile, curl)
- */
 function isAllowedOrigin(origin) {
-  if (!origin) return true;
+  if (!origin) return true; // mobile apps, curl
   if (allowedOrigins.includes(origin)) return true;
-  if (origin.endsWith(".vercel.app")) return true;
+  if (origin.includes(".vercel.app")) return true;
   return false;
 }
 
@@ -51,11 +44,17 @@ const corsOptions = {
     }
   },
   credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 };
 
-/* 🔥 IMPORTANT: handle preflight BEFORE routes */
-app.options("*", cors(corsOptions));
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
+/* ---------------- BASIC MIDDLEWARE ---------------- */
+
+app.use(cookieParser());
+app.use(express.json());
 
 /* ---------------- SESSION ---------------- */
 
@@ -70,6 +69,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    proxy: true,
     cookie: {
       httpOnly: true,
       secure: true,
@@ -87,9 +87,8 @@ app.use(passport.session());
 /* ---------------- ROUTES ---------------- */
 
 app.use("/auth", authRoutes);
-app.use("/api/notes", notesRoutes);
 app.use("/api/device", deviceRoutes);
-app.use("/api/sync", notesRoutes); // if sync routes are here
+app.use("/api/sync", syncRoutes);
 
 app.get("/", (req, res) => {
   res.send("✅ Backend running fine");
@@ -98,8 +97,8 @@ app.get("/", (req, res) => {
 /* ---------------- START SERVER ---------------- */
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () =>
-  console.log(`✅ Server running on port ${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
 
 export { pool };
