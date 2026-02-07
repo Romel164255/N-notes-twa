@@ -30,39 +30,31 @@ const allowedOrigins = process.env.CLIENT_URLS
   ? process.env.CLIENT_URLS.split(",").map(o => o.trim())
   : [];
 
-function isAllowedOrigin(origin) {
-  if (!origin) return true; // mobile apps, curl
-  if (allowedOrigins.includes(origin)) return true;
-  if (origin.includes(".vercel.app")) return true;
-  return false;
-}
-
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) {
-      // mobile apps, curl, same-origin
-      return callback(null, true);
-    }
+    // Allow same-origin, mobile apps, curl
+    if (!origin) return callback(null, true);
 
-    if (
+    const isAllowed =
       allowedOrigins.includes(origin) ||
-      origin.includes(".vercel.app")
-    ) {
+      origin.endsWith(".vercel.app");
+
+    if (isAllowed) {
       return callback(null, true);
     }
 
-    // ❗ DO NOT THROW
-    return callback(null, false);
+    console.log("❌ CORS blocked origin:", origin);
+    return callback(new Error("Not allowed by CORS"));
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  optionsSuccessStatus: 200,
 };
-
-
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
+
 
 /* ---------------- BASIC MIDDLEWARE ---------------- */
 
@@ -108,9 +100,13 @@ app.get("/", (req, res) => {
 });
 
 app.get("/__version", (req, res) => {
-  res.json({ version: "cors-fix-2026-02-07" });
+  res.json({ version: "cors-clean-2026-02-07" });
 });
 
+app.use((err, req, res, next) => {
+  console.error("🔥 Unhandled error:", err);
+  res.status(500).json({ error: "Internal server error" });
+});
 
 /* ---------------- START SERVER ---------------- */
 

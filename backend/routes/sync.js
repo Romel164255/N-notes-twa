@@ -37,8 +37,8 @@ router.get("/pull", authJwt, async (req, res) => {
 /* -------------------------------------------------
    📤 PUSH (upload/update note metadata)
 -------------------------------------------------- */
-router.post("/", authJwt, async (req, res) => {
-  const { id, updatedAt, payload } = req.body;
+router.post("/push", authJwt, async (req, res) => {
+const { id, updatedAt, payload } = req.body;
 
   try {
     await pool.query(

@@ -34,11 +34,14 @@ router.get(
  * CURRENT USER
  */
 router.get("/me", (req, res) => {
-  res.json(
-    req.isAuthenticated()
-      ? { loggedIn: true, user: req.user }
-      : { loggedIn: false }
-  );
+  try {
+    if (req.isAuthenticated?.()) {
+      return res.json({ loggedIn: true, user: req.user });
+    }
+    return res.json({ loggedIn: false });
+  } catch (err) {
+    return res.json({ loggedIn: false });
+  }
 });
 
 /**
