@@ -5,7 +5,7 @@ const router = express.Router();
 
 /**
  * START GOOGLE LOGIN
- * OAuth always starts on OUR domain
+ * Always starts on BACKEND domain
  */
 router.get(
   "/google",
@@ -16,42 +16,51 @@ router.get(
 
 /**
  * GOOGLE CALLBACK
- * OAuth always ends on OUR domain
+ * Must END on FRONTEND domain
  */
 router.get(
   "/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/",
+    failureRedirect: "/auth/failure",
   }),
   (req, res) => {
-    // ✅ Stay inside the trusted origin
-    res.redirect("/");
-    // or "/app" or "/dashboard"
+    // 🔑 CRITICAL: redirect to FRONTEND, not backend
+    res.redirect(process.env.FRONTEND_URL);
   }
 );
+
+/**
+ * AUTH FAILURE (debug safe)
+ */
+router.get("/failure", (req, res) => {
+  res.status(401).json({ error: "Authentication failed" });
+});
 
 /**
  * CURRENT USER
  */
 router.get("/me", (req, res) => {
-  try {
-    if (req.isAuthenticated?.()) {
-      return res.json({ loggedIn: true, user: req.user });
-    }
-    return res.json({ loggedIn: false });
-  } catch (err) {
-    return res.json({ loggedIn: false });
+  if (req.isAuthenticated && req.isAuthenticated()) {
+    return res.json({ loggedIn: true, user: req.user });
   }
+  return res.json({ loggedIn: false });
 });
 
 /**
  * LOGOUT
  */
-router.get("/logout", (req, res, next) => {
+router.post("/logout", (req, res, next) => {
   req.logout(err => {
     if (err) return next(err);
-    res.clearCookie("connect.sid");
-    res.status(200).json({ ok: true });
+
+    // 🔑 MUST match cookie settings exactly
+    res.clearCookie("connect.sid", {
+      path: "/",
+      secure: true,
+      sameSite: "none",
+    });
+
+    res.json({ ok: true });
   });
 });
 

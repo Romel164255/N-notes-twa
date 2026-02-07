@@ -1,4 +1,4 @@
-console.log("🔥 BOOT SIGNATURE: server.js 2026-02-07 FINAL");
+console.log("🔥 BOOT SIGNATURE: server.js FINAL");
 
 import express from "express";
 import session from "express-session";
@@ -22,9 +22,11 @@ import deviceRoutes from "./routes/device.js";
 /* ---------------- APP INIT ---------------- */
 
 const app = express();
+
+// 🔑 REQUIRED for Render / proxy HTTPS
 app.set("trust proxy", 1);
 
-/* ---------------- CORS (ABSOLUTELY FIRST) ---------------- */
+/* ---------------- CORS (FIRST, ALWAYS) ---------------- */
 
 const allowedOrigins = process.env.CLIENT_URLS
   ? process.env.CLIENT_URLS.split(",").map(o => o.trim())
@@ -32,19 +34,17 @@ const allowedOrigins = process.env.CLIENT_URLS
 
 const corsOptions = {
   origin: (origin, callback) => {
-    // allow same-origin, curl, mobile apps
+    // Allow same-origin, curl, mobile apps
     if (!origin) return callback(null, true);
 
     const isAllowed =
       allowedOrigins.includes(origin) ||
       origin.endsWith(".vercel.app");
 
-    if (isAllowed) {
-      return callback(null, true);
-    }
+    if (isAllowed) return callback(null, true);
 
-    console.log("❌ CORS blocked origin:", origin);
-    return callback(null, false); // ✅ NEVER throw here
+    console.log("❌ CORS blocked:", origin);
+    return callback(null, false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -65,6 +65,7 @@ const PgStore = connectPgSimple(session);
 
 app.use(
   session({
+    name: "connect.sid", // explicit
     store: new PgStore({
       pool,
       tableName: "session",
@@ -75,9 +76,9 @@ app.use(
     proxy: true,
     cookie: {
       httpOnly: true,
-      secure: true,        // required for Render + HTTPS
-      sameSite: "none",    // required for cross-site cookies
-      maxAge: 1000 * 60 * 60 * 24 * 30,
+      secure: true,       // REQUIRED for HTTPS
+      sameSite: "none",   // REQUIRED for cross-site
+      maxAge: 1000 * 60 * 60 * 24 * 30, // 30 days
     },
   })
 );
@@ -96,12 +97,14 @@ app.use("/api/sync", syncRoutes);
 /* ---------------- HEALTH ---------------- */
 
 app.get("/", (req, res) => {
-  res.send("✅ Backend running fine — FINAL");
+  res.send("✅ Backend running fine");
 });
 
-app.get("/v", (req, res) => {
-  console.log("🔥 __version route HIT");
-  res.json({ version: "cors-fixed-final" });
+app.get("/health", (req, res) => {
+  res.json({
+    ok: true,
+    authenticated: req.isAuthenticated?.() || false,
+  });
 });
 
 /* ---------------- ERROR HANDLER ---------------- */
