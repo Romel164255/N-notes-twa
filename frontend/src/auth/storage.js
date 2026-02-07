@@ -1,41 +1,13 @@
-import { Capacitor } from "@capacitor/core";
-
-let Preferences;
-
-// Lazy import ONLY on native
-async function getPreferences() {
-  if (!Preferences) {
-    const mod = await import("@capacitor/preferences");
-    Preferences = mod.Preferences;
-  }
-  return Preferences;
-}
-
 export const storage = {
-  async get(key) {
-    if (Capacitor.isNativePlatform()) {
-      const prefs = await getPreferences();
-      const { value } = await prefs.get({ key });
-      return value;
-    }
+  get(key) {
     return localStorage.getItem(key);
   },
 
-  async set(key, value) {
-    if (Capacitor.isNativePlatform()) {
-      const prefs = await getPreferences();
-      await prefs.set({ key, value });
-    } else {
-      localStorage.setItem(key, value);
-    }
+  set(key, value) {
+    localStorage.setItem(key, value);
   },
 
-  async remove(key) {
-    if (Capacitor.isNativePlatform()) {
-      const prefs = await getPreferences();
-      await prefs.remove({ key });
-    } else {
-      localStorage.removeItem(key);
-    }
+  remove(key) {
+    localStorage.removeItem(key);
   },
 };

@@ -5,34 +5,28 @@ const router = express.Router();
 
 /**
  * START GOOGLE LOGIN
- * We pass `client` via OAuth state (survives Google redirects)
+ * OAuth always starts on OUR domain
  */
-router.get("/google", (req, res, next) => {
-  const client = req.query.client || "web";
-
+router.get(
+  "/google",
   passport.authenticate("google", {
     scope: ["profile", "email"],
-    state: client, // 🔑 survives redirect
-  })(req, res, next);
-});
+  })
+);
 
 /**
  * GOOGLE CALLBACK
+ * OAuth always ends on OUR domain
  */
 router.get(
   "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
+  passport.authenticate("google", {
+    failureRedirect: "/",
+  }),
   (req, res) => {
-    const client = req.query.state; // 🔑 returned by Google
-
-    // 📱 APK → return control to Capacitor WebView with deep link
-    if (client === "apk") {
-      // This should trigger the appUrlOpen listener in your app
-      return res.redirect("com.romel.nnotes://oauth-callback");
-    }
-
-    // 🌐 Web users
-    return res.redirect("https://n-notes-twa.vercel.app");
+    // ✅ Stay inside the trusted origin
+    res.redirect("/");
+    // or "/app" or "/dashboard"
   }
 );
 
