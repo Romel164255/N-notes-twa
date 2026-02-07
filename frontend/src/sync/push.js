@@ -1,27 +1,29 @@
+// frontend/sync/push.js
 import { db } from "../db/adapter";
-import { Token } from "../auth/token";
 
 export async function pushNotes() {
-  // Adapter method — YOU must expose this in indexedDb + sqlite
   const dirtyNotes = await db.getDirtyNotes();
   if (!dirtyNotes.length) return;
 
-  const token = await Token.get();
-
   for (const note of dirtyNotes) {
     try {
-      await fetch(`${import.meta.env.VITE_API_URL}/api/sync/push`, {
-  method: "POST",
-  credentials: "include",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    id: note.id,
-    updatedAt: note.updatedAt,
-    payload: note.payload,
-  }),
-});
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/sync/push`,
+        {
+          method: "POST",
+          credentials: "include", // 🔑 session cookie
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            id: note.id,
+            updatedAt: note.updatedAt,
+            payload: note.payload,
+          }),
+        }
+      );
 
-
+      if (!res.ok) continue;
 
       await db.markClean(note.id);
     } catch (err) {

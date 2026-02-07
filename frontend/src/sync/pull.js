@@ -1,22 +1,24 @@
+// frontend/sync/pull.js
 import { db } from "../db/adapter";
-import { Token } from "../auth/token";
 import { saveConflict } from "./conflicts";
 
 export async function pullNotes() {
-  const token = await Token.get();
+  let res;
 
- const res = await fetch(
-  `${import.meta.env.VITE_API_URL}/api/sync/pull`,
-  {
-    credentials: "include",
+  try {
+    res = await fetch(
+      `${import.meta.env.VITE_API_URL}/api/sync/pull`,
+      {
+        credentials: "include", // 🔑 session cookie
+      }
+    );
+  } catch {
+    return; // network error / offline
   }
-);
-
-
 
   if (!res.ok) return;
 
-  const remoteNotes = await res.json();
+  const { notes: remoteNotes } = await res.json();
 
   for (const remote of remoteNotes) {
     const local = await db.getNote(remote.id);
