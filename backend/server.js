@@ -94,6 +94,11 @@ app.get("/", (req, res) => {
   res.send("✅ Backend running fine");
 });
 
+app.get("/__version", (req, res) => {
+  res.json({ version: "cors-fix-2026-02-07" });
+});
+
+
 /* ---------------- START SERVER ---------------- */
 
 const PORT = process.env.PORT || 5000;
