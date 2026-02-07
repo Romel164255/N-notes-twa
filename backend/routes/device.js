@@ -4,7 +4,7 @@ import { pool } from "../db.js";
 const router = express.Router();
 
 router.post("/", async (req, res) => {
-  if (!req.user) {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
     return res.status(401).json({ error: "Not authenticated" });
   }
 
@@ -12,7 +12,8 @@ router.post("/", async (req, res) => {
 
   await pool.query(
     `
-    INSERT INTO device_info (user_id, platform, model, os, app_version, last_seen)
+    INSERT INTO device_info
+      (user_id, platform, model, os, app_version, last_seen)
     VALUES ($1, $2, $3, $4, $5, NOW())
     ON CONFLICT (user_id, platform)
     DO UPDATE SET

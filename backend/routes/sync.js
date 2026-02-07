@@ -1,21 +1,21 @@
-// backend/routes/sync.js
 import express from "express";
 import { pool } from "../db.js";
-import authJwt from "../middleware/authJwt.js";
 
 const router = express.Router();
 
-/* -------------------------------------------------
-   ✅ ALWAYS allow preflight for sync routes
--------------------------------------------------- */
-router.options("*", (req, res) => {
-  res.sendStatus(204);
-});
+router.options("*", (_, res) => res.sendStatus(204));
 
-/* -------------------------------------------------
-   📥 PULL (download notes)
--------------------------------------------------- */
-router.get("/pull", authJwt, async (req, res) => {
+function requireAuth(req, res) {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
+    res.status(401).json({ error: "Not authenticated" });
+    return false;
+  }
+  return true;
+}
+
+router.get("/pull", async (req, res) => {
+  if (!requireAuth(req, res)) return;
+
   try {
     const { rows } = await pool.query(
       `
@@ -34,11 +34,10 @@ router.get("/pull", authJwt, async (req, res) => {
   }
 });
 
-/* -------------------------------------------------
-   📤 PUSH (upload/update note metadata)
--------------------------------------------------- */
-router.post("/push", authJwt, async (req, res) => {
-const { id, updatedAt, payload } = req.body;
+router.post("/push", async (req, res) => {
+  if (!requireAuth(req, res)) return;
+
+  const { id, updatedAt, payload } = req.body;
 
   try {
     await pool.query(

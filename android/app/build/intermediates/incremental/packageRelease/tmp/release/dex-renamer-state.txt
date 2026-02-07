@@ -1,0 +1,4 @@
+#Sun Feb 08 01:03:15 IST 2026
+base.0=/media/data/Projects/N-notes-twa/android/app/build/intermediates/dex/release/minifyReleaseWithR8/classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

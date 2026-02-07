@@ -6,13 +6,15 @@ export async function pullNotes() {
   const token = await Token.get();
 
   const res = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/sync/pull`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  );
+  `${import.meta.env.VITE_API_URL}/api/sync/pull`,
+  {
+    credentials: "include", // 🔥 REQUIRED
+    headers: {
+      Authorization: `Bearer ${token}`, // keep for now
+    },
+  }
+);
+
 
   if (!res.ok) return;
 
