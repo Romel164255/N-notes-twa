@@ -5,15 +5,13 @@ import { saveConflict } from "./conflicts";
 export async function pullNotes() {
   const token = await Token.get();
 
-  const res = await fetch(
+ const res = await fetch(
   `${import.meta.env.VITE_API_URL}/api/sync/pull`,
   {
-    credentials: "include", // 🔥 REQUIRED
-    headers: {
-      Authorization: `Bearer ${token}`, // keep for now
-    },
+    credentials: "include",
   }
 );
+
 
 
   if (!res.ok) return;

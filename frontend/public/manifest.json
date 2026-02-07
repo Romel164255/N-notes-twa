@@ -1,7 +1,6 @@
 {
   "name": "N Notes",
   "short_name": "NNotes",
-  "description": "Local-first notes with sync",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

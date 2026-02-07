@@ -11,18 +11,16 @@ export async function pushNotes() {
   for (const note of dirtyNotes) {
     try {
       await fetch(`${import.meta.env.VITE_API_URL}/api/sync/push`, {
-      method: "POST",
-      credentials: "include", // 🔥 REQUIRED
-      headers: {
-      Authorization: `Bearer ${token}`, // keep for now
-      "Content-Type": "application/json",
-        },
-      body: JSON.stringify({
-      id: note.id,
-      updatedAt: note.updatedAt,
-      version: note.version,
-        }),
-    });
+  method: "POST",
+  credentials: "include",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    id: note.id,
+    updatedAt: note.updatedAt,
+    payload: note.payload,
+  }),
+});
+
 
 
       await db.markClean(note.id);
