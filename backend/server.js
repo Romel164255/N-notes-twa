@@ -1,4 +1,5 @@
-console.log("🔥 RUNNING server.js ENTRY FILE");
+console.log("🔥 BOOT SIGNATURE: server.js 2026-02-07 A");
+
 
 import express from "express";
 import session from "express-session";
@@ -96,7 +97,7 @@ app.use("/api/device", deviceRoutes);
 app.use("/api/sync", syncRoutes);
 
 app.get("/", (req, res) => {
-  res.send("✅ Backend running fine");
+res.send("✅ Backend running fine — BOOT A");
 });
 
 app.get("/v", (req, res) => {
