@@ -1,7 +1,7 @@
 // backend/routes/sync.js
 import express from "express";
 import { pool } from "../db.js";
-import authJwt from "../middleware/jwt.js";
+import authJwt from "../middleware/authJwt.js";
 
 const router = express.Router();
 
