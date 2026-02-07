@@ -39,16 +39,27 @@ function isAllowedOrigin(origin) {
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (isAllowedOrigin(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error("Blocked by CORS"));
+    if (!origin) {
+      // mobile apps, curl, same-origin
+      return callback(null, true);
     }
+
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.includes(".vercel.app")
+    ) {
+      return callback(null, true);
+    }
+
+    // ❗ DO NOT THROW
+    return callback(null, false);
   },
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 };
+
+
 
 app.use(cors(corsOptions));
 app.options("*", cors(corsOptions));
