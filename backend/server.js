@@ -99,7 +99,8 @@ app.get("/", (req, res) => {
   res.send("✅ Backend running fine");
 });
 
-app.get("/__version", (req, res) => {
+app.get("/v", (req, res) => {
+   console.log("🔥 __version route HIT");
   res.json({ version: "cors-clean-2026-02-07" });
 });
 
