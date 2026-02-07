@@ -1,3 +1,5 @@
+console.log("🔥 RUNNING server.js ENTRY FILE");
+
 import express from "express";
 import session from "express-session";
 import passport from "passport";
